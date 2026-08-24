@@ -196,5 +196,23 @@ public class LoggerTest {
         logger.logWithTimeZone("User logged in", ZoneId.of("Europe/London"));
         logger.logWithTimeZone("Backup completed", ZoneId.of("Asia/Tokyo"));
 
+        System.out.println("\n----- PII Masking Test -----");
+        logger.logWithMaskedPii("Contact user at user@example.com or phone 123-456-7890 with card 1234-5678-9012-3456");
+
+        System.out.println("\n----- SHA-256 Hash Test -----");
+        logger.logSha256Hash("Secret message to hash");
+
+        System.out.println("\n----- NATO Phonetic Test -----");
+        logger.logInNatoPhonetic("SOS");
+
+        System.out.println("\n----- Hex & Binary Test -----");
+        logger.logInHex("Hello");
+        logger.logInBinary("Hi");
+
+        System.out.println("\n----- Composite Logger Test -----");
+        Logger consoleLogger = Logger.getDefaultLogger();
+        Logger redLogger = Logger.getRedDefaultLogger();
+        Logger composite = Logger.getCompositeLogger(consoleLogger, redLogger);
+        composite.log("Broadcast to multiple loggers!");
     }
 }

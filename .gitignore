@@ -40,3 +40,17 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Python & Streamlit ###
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+.streamlit/secrets.toml
+
+### Logs & Temp files ###
+log.txt
+*.log

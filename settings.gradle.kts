@@ -1,2 +1,2 @@
-rootProject.name = "logger"
+rootProject.name = "FlexiLogger"
 

@@ -19,3 +19,8 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+tasks.register<JavaExec>("runLoggerTest") {
+    mainClass.set("LoggerTest")
+    classpath = sourceSets["test"].runtimeClasspath
+}

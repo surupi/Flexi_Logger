@@ -626,4 +626,88 @@ public interface Logger {
         log("[" + timestamp + "] " + message, "\u001B[37m");
     }
 
+    // PII Data Masking
+    default void logWithMaskedPii(String message) {
+        String masked = message
+                // Mask Email Addresses
+                .replaceAll("(?i)\\b([a-z0-9._%+-]+)@([a-z0-9.-]+\\.[a-z]{2,})\\b", "$1***@***.$2")
+                // Mask Credit Card format (16 digits)
+                .replaceAll("\\b(?:\\d[ -]*?){13,16}\\b", "****-****-****-****")
+                // Mask Phone numbers
+                .replaceAll("\\b\\d{3}[-.]?\\d{3}[-.]?\\d{4}\\b", "***-***-****");
+        log(masked);
+    }
+
+    // SHA-256 Cryptographic Hash Logging
+    default void logSha256Hash(String message) {
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(message.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            log("[SHA-256] " + hexString);
+        } catch (Exception e) {
+            log("Error hashing message: " + e.getMessage());
+        }
+    }
+
+    // Asynchronous non-blocking logging
+    default void logAsync(String message) {
+        java.util.concurrent.CompletableFuture.runAsync(() -> log("[ASYNC] " + message));
+    }
+
+    // Composite Logger broadcasting to multiple loggers
+    static Logger getCompositeLogger(Logger... loggers) {
+        return message -> {
+            for (Logger logger : loggers) {
+                logger.log(message);
+            }
+        };
+    }
+
+    // NATO Phonetic Alphabet Logging
+    default void logInNatoPhonetic(String message) {
+        Map<Character, String> natoMap = Map.ofEntries(
+                Map.entry('a', "Alpha"), Map.entry('b', "Bravo"), Map.entry('c', "Charlie"),
+                Map.entry('d', "Delta"), Map.entry('e', "Echo"), Map.entry('f', "Foxtrot"),
+                Map.entry('g', "Golf"), Map.entry('h', "Hotel"), Map.entry('i', "India"),
+                Map.entry('j', "Juliett"), Map.entry('k', "Kilo"), Map.entry('l', "Lima"),
+                Map.entry('m', "Mike"), Map.entry('n', "November"), Map.entry('o', "Oscar"),
+                Map.entry('p', "Papa"), Map.entry('q', "Quebec"), Map.entry('r', "Romeo"),
+                Map.entry('s', "Sierra"), Map.entry('t', "Tango"), Map.entry('u', "Uniform"),
+                Map.entry('v', "Victor"), Map.entry('w', "Whiskey"), Map.entry('x', "Xray"),
+                Map.entry('y', "Yankee"), Map.entry('z', "Zulu")
+        );
+        StringBuilder result = new StringBuilder();
+        for (char ch : message.toLowerCase().toCharArray()) {
+            if (natoMap.containsKey(ch)) {
+                result.append(natoMap.get(ch)).append(" ");
+            } else {
+                result.append(ch).append(" ");
+            }
+        }
+        log(result.toString().trim());
+    }
+
+    // Hexadecimal Representation Logging
+    default void logInHex(String message) {
+        StringBuilder hexString = new StringBuilder();
+        for (char ch : message.toCharArray()) {
+            hexString.append(Integer.toHexString((int) ch)).append(" ");
+        }
+        log(hexString.toString().trim());
+    }
+
+    // Binary Representation Logging
+    default void logInBinary(String message) {
+        StringBuilder binaryString = new StringBuilder();
+        for (char ch : message.toCharArray()) {
+            binaryString.append(String.format("%8s", Integer.toBinaryString(ch)).replace(' ', '0')).append(" ");
+        }
+        log(binaryString.toString().trim());
+    }
 }
